@@ -5,22 +5,17 @@ import { MemoArticle } from "@/components/MemoArticle";
 import { PageTransition } from "@/components/PageTransition";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { Screen } from "@/components/Screen";
-import { StoredMemoArticle } from "@/components/StoredMemoArticle";
-import { MEMOS, getMemo } from "@/data/memos";
+import { getMemo } from "@/lib/memos";
 
 type Params = PageProps<"/memos/[id]">["params"];
 
-export function generateStaticParams() {
-  return MEMOS.map((memo) => ({ id: memo.id }));
-}
-
 export async function generateMetadata({ params }: PageProps<"/memos/[id]">): Promise<Metadata> {
-  const memo = getMemo((await params).id);
+  const memo = await getMemo((await params).id);
   return { title: memo ? `${memo.title} - 메모` : "메모" };
 }
 
 async function PinButton({ params }: { params: Params }) {
-  const pinned = getMemo((await params).id)?.pinned ?? false;
+  const pinned = (await getMemo((await params).id))?.pinned ?? false;
   return (
     <IconButton
       icon="pin-24"
@@ -32,13 +27,21 @@ async function PinButton({ params }: { params: Params }) {
 }
 
 async function MemoContent({ params }: { params: Params }) {
-  const { id } = await params;
-  const memo = getMemo(id);
-  // 예시 메모가 아니면 이 브라우저에 저장한 메모에서 찾는다
-  return memo ? <MemoArticle memo={memo} /> : <StoredMemoArticle id={id} />;
+  const memo = await getMemo((await params).id);
+
+  if (!memo) {
+    return (
+      <div className="flex flex-col gap-8 rounded-xl bg-surface-card px-20 py-24">
+        <h1 className="text-title-lg text-text-primary">메모를 찾을 수 없어요</h1>
+        <p className="text-body-md text-text-secondary">지워졌거나 주소가 잘못된 메모예요.</p>
+      </div>
+    );
+  }
+
+  return <MemoArticle memo={memo} />;
 }
 
-// 주소에 따라 달라지는 부분(고정 상태, 본문)만 Suspense 안에서 읽는다
+// 주소에 따라 달라지는 부분(고정 상태, 본문)만 Suspense 안에서 Supabase에서 읽는다
 export default function MemoDetailPage({ params }: PageProps<"/memos/[id]">) {
   return (
     <PageTransition>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CATEGORIES, type MemoLabel } from "@/data/memos";
-import { readDraft, saveDraft, saveMemo, useHydrated, type Draft } from "@/lib/memoStore";
+import { createMemo } from "@/lib/memoActions";
+import { clearDraft, readDraft, saveDraft, useHydrated, type Draft } from "@/lib/memoStore";
 import { Chip } from "./Chip";
 import { IconButton } from "./IconButton";
 import { LabelDot } from "./LabelDot";
@@ -15,13 +16,15 @@ const LABELS: MemoLabel[] = ["blue", "green", "orange", "pink"];
 
 const EMPTY_DRAFT: Draft = { title: "", category: "업무", label: "blue", body: [] };
 
-/** 메모 작성 화면. 쓰는 동안 이 브라우저에 자동 저장하고, 저장하면 홈으로 간다. */
+/** 메모 작성 화면. 쓰는 동안 이 브라우저에 임시 저장하고, 저장하면 Supabase에 넣은 뒤 홈으로 간다. */
 export function ComposeScreen() {
   const router = useRouter();
   const hydrated = useHydrated();
   const [draft, setDraft] = useState<Draft | null>(null);
   const current = draft ?? (hydrated ? (readDraft() ?? EMPTY_DRAFT) : null);
   const [autoSaved, setAutoSaved] = useState(false);
+  const [saving, startSaving] = useTransition();
+  const [saveError, setSaveError] = useState(false);
 
   // 바뀐 내용은 잠시 뒤 임시 저장한다
   useEffect(() => {
@@ -40,17 +43,29 @@ export function ComposeScreen() {
   };
 
   const save = () => {
-    if (!current) return;
-    saveMemo({ ...current, title: current.title.trim() || "제목 없음" });
-    router.push("/", { transitionTypes: ["nav-down"] });
+    if (!current || saving) return;
+    setSaveError(false);
+    startSaving(async () => {
+      try {
+        await createMemo(current);
+      } catch {
+        setSaveError(true);
+        return;
+      }
+      clearDraft();
+      router.push("/", { transitionTypes: ["nav-down"] });
+    });
   };
 
   return (
-    <Screen topClassName="pt-48" bottomAction={<PrimaryButton label="저장하기" onClick={save} />}>
+    <Screen
+      topClassName="pt-48"
+      bottomAction={<PrimaryButton label={saving ? "저장하는 중" : "저장하기"} onClick={save} />}
+    >
       <nav className="flex items-center justify-between">
         <IconButton icon="chevron-left" label="홈으로" href="/" transitionTypes={["nav-down"]} />
         <p aria-live="polite" className="text-caption-sm whitespace-nowrap text-text-muted">
-          {autoSaved ? "자동 저장됨" : ""}
+          {saveError ? "저장하지 못했어요. 다시 눌러 주세요" : autoSaved ? "자동 저장됨" : ""}
         </p>
       </nav>
 

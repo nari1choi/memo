@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { CATEGORIES, type MemoCategory } from "@/data/memos";
+import { Suspense, use, useState } from "react";
+import { CATEGORIES, type Memo, type MemoCategory } from "@/data/memos";
 import { groupByDay, matchesQuery, sortMemos, type SortOrder } from "@/lib/memoGroups";
-import { useAllMemos, useHydrated } from "@/lib/memoStore";
+import { useHydrated } from "@/lib/memoStore";
 import { Chip } from "./Chip";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
@@ -15,16 +15,16 @@ type Filter = "전체" | MemoCategory;
 
 const SORT_LABEL: Record<SortOrder, string> = { newest: "최신순", oldest: "오래된순" };
 
-/** 전체 메모 목록. 검색·분류·정렬로 거르고, 날짜별로 묶어 한꺼번에 보여 준다. */
-export function AllMemosScreen() {
-  const hydrated = useHydrated();
-  const allMemos = useAllMemos();
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>("전체");
-  const [order, setOrder] = useState<SortOrder>("newest");
+function MemoCount({ memos }: { memos: Promise<Memo[]> }) {
+  return <>{use(memos).length}</>;
+}
 
+type MemoResultsProps = { memos: Promise<Memo[]>; query: string; filter: Filter; order: SortOrder };
+
+function MemoResults({ memos, query, filter, order }: MemoResultsProps) {
+  const hydrated = useHydrated();
   const matched = sortMemos(
-    allMemos.filter(
+    use(memos).filter(
       (memo) => (filter === "전체" || memo.category === filter) && matchesQuery(memo, query),
     ),
     order,
@@ -33,12 +33,43 @@ export function AllMemosScreen() {
   const groups = hydrated ? groupByDay(matched, new Date()) : [];
 
   return (
+    <>
+      {hydrated && matched.length === 0 && (
+        <p className="py-48 text-center text-body-md text-text-muted">찾는 메모가 없어요</p>
+      )}
+
+      <div className="flex flex-col gap-20">
+        {groups.map((group) => (
+          <section key={group.label} className="flex flex-col gap-8">
+            {/* 날짜 머리글은 스크롤해도 화면 위쪽에 붙어 있다 */}
+            <h2 className="sticky top-0 z-10 bg-surface-page px-8 text-caption-md text-text-muted">
+              {group.label}
+            </h2>
+            <MemoCard memos={group.memos} />
+          </section>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/** 전체 메모 목록. 검색·분류·정렬로 거르고, 날짜별로 묶어 한꺼번에 보여 준다. */
+export function AllMemosScreen({ memos }: { memos: Promise<Memo[]> }) {
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<Filter>("전체");
+  const [order, setOrder] = useState<SortOrder>("newest");
+
+  return (
     <Screen topClassName="pt-48">
       <nav className="flex items-center">
         <IconButton icon="chevron-left" label="홈으로" href="/" transitionTypes={["nav-back"]} />
         <h1 className="flex min-w-0 flex-1 items-baseline gap-8 px-4 whitespace-nowrap">
           <span className="text-title-lg text-text-primary">전체 메모</span>
-          <span className="text-caption-md text-text-muted">{allMemos.length}</span>
+          <span className="text-caption-md text-text-muted">
+            <Suspense fallback="…">
+              <MemoCount memos={memos} />
+            </Suspense>
+          </span>
         </h1>
         <button
           type="button"
@@ -74,21 +105,9 @@ export function AllMemosScreen() {
           ))}
         </div>
 
-        {hydrated && matched.length === 0 && (
-          <p className="py-48 text-center text-body-md text-text-muted">찾는 메모가 없어요</p>
-        )}
-
-        <div className="flex flex-col gap-20">
-          {groups.map((group) => (
-            <section key={group.label} className="flex flex-col gap-8">
-              {/* 날짜 머리글은 스크롤해도 화면 위쪽에 붙어 있다 */}
-              <h2 className="sticky top-0 z-10 bg-surface-page px-8 text-caption-md text-text-muted">
-                {group.label}
-              </h2>
-              <MemoCard memos={group.memos} />
-            </section>
-          ))}
-        </div>
+        <Suspense fallback={<div className="flex-1 rounded-xl bg-surface-card" />}>
+          <MemoResults memos={memos} query={query} filter={filter} order={order} />
+        </Suspense>
       </main>
 
       <ScrollTopButton />
