@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "memo-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "memo-01-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "../memo-01", "run", "dev", "--", "-p", "3001"],
+      "port": 3001
+    }
+  ]
+}

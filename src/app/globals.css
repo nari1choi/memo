@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/*
+ * 디자인 토큰 (CLAUDE.md와 같은 이름)
+ * 토큰 이름의 "/"는 "-"로 바꿔 쓴다. 예: color/primary → bg-primary, text-primary
+ * Tailwind 기본 색·간격·모서리·글자 크기는 지워서 토큰만 쓸 수 있게 한다.
+ */
+@theme {
+  --color-*: initial;
+  --spacing: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+
+  /* 글꼴 */
+  --font-sans: var(--font-noto-sans-kr), sans-serif;
+
+  /* 색 — Light (Dark는 아래 media query에서 덮어쓴다) */
+  --color-primary: #3182f6;
+  --color-surface-page: #f2f4f6;
+  --color-surface-card: #ffffff;
+  --color-text-primary: #191f28;
+  --color-text-secondary: #4e5968;
+  --color-text-muted: #8b95a1;
+  --color-text-on-primary: #ffffff;
+  --color-border-default: #e5e8eb;
+  --color-label-blue: #3182f6;
+  --color-label-blue-soft: #e8f3ff;
+  --color-label-green: #12a150;
+  --color-label-green-soft: #e3f8ec;
+  --color-label-orange: #f76808;
+  --color-label-orange-soft: #fff1e5;
+  --color-label-pink: #e5397a;
+  --color-label-pink-soft: #ffeaf1;
+
+  /* 간격 — space/16 → p-16, gap-16 …
+     0은 토큰이 아니라 "간격 없음"이다. top-0, bottom-0, min-w-0이 동작하게 둔다. */
+  --spacing-0: 0px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-34: 34px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+
+  /* 모서리 — radius/md → rounded-md */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* 텍스트 스타일 — heading/xl → text-heading-xl */
+  --text-heading-xl: 28px;
+  --text-heading-xl--line-height: 38px;
+  --text-heading-xl--letter-spacing: -0.8px;
+  --text-heading-xl--font-weight: 700;
+
+  --text-heading-lg: 26px;
+  --text-heading-lg--line-height: 36px;
+  --text-heading-lg--letter-spacing: -0.8px;
+  --text-heading-lg--font-weight: 700;
+
+  --text-title-lg: 20px;
+  --text-title-lg--line-height: 28px;
+  --text-title-lg--letter-spacing: -0.4px;
+  --text-title-lg--font-weight: 700;
+
+  --text-title-md: 17px;
+  --text-title-md--line-height: 24px;
+  --text-title-md--letter-spacing: -0.3px;
+  --text-title-md--font-weight: 700;
+
+  --text-label-md: 15px;
+  --text-label-md--line-height: 22px;
+  --text-label-md--letter-spacing: -0.2px;
+  --text-label-md--font-weight: 700;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 28px;
+  --text-body-md--letter-spacing: -0.2px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--letter-spacing: -0.1px;
+  --text-body-sm--font-weight: 400;
+
+  --text-caption-md: 15px;
+  --text-caption-md--line-height: 22px;
+  --text-caption-md--letter-spacing: -0.2px;
+  --text-caption-md--font-weight: 500;
+
+  --text-caption-sm: 13px;
+  --text-caption-sm--line-height: 18px;
+  --text-caption-sm--letter-spacing: 0px;
+  --text-caption-sm--font-weight: 500;
+
+  --text-button-md: 17px;
+  --text-button-md--line-height: 24px;
+  --text-button-md--letter-spacing: -0.2px;
+  --text-button-md--font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #4d94ff;
+    --color-surface-page: #101014;
+    --color-surface-card: #1c1c22;
+    --color-text-primary: #f1f3f5;
+    --color-text-secondary: #b3bac2;
+    --color-text-muted: #6e7783;
+    --color-text-on-primary: #ffffff;
+    --color-border-default: #2a2a33;
+    --color-label-blue: #6aa6ff;
+    --color-label-blue-soft: #1d2a40;
+    --color-label-green: #3ccb7f;
+    --color-label-green-soft: #17302a;
+    --color-label-orange: #ff9446;
+    --color-label-orange-soft: #3a2817;
+    --color-label-pink: #ff6fa2;
+    --color-label-pink-soft: #3b1d2a;
+  }
+}
+
+/*
+ * 화면 전환 모션 (React <ViewTransition> + 링크의 transitionTypes)
+ * - nav-forward / nav-back: 깊이 들어가기 / 돌아오기. 가로로 밀린다.
+ * - nav-up / nav-down: 작성 화면 열기 / 닫기. 아래에서 올라오고 아래로 내려간다.
+ * 들어오는 화면은 Magic UI의 Blur Fade처럼 흐림이 걷히며 나타난다.
+ */
+:root {
+  --motion-exit: 150ms;
+  --motion-enter: 210ms;
+  --motion-move: 400ms;
+  --motion-blur: 6px;
+  --motion-slide-x: 60px;
+  --motion-slide-y: 40px;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.nav-forward),
+::view-transition-old(.nav-back),
+::view-transition-old(.nav-up) {
+  animation:
+    var(--motion-exit) ease-in both motion-fade reverse,
+    var(--motion-move) ease-in-out both motion-slide reverse;
+}
+
+::view-transition-new(.nav-forward),
+::view-transition-new(.nav-back),
+::view-transition-new(.nav-down) {
+  animation:
+    var(--motion-enter) ease-out var(--motion-exit) both motion-fade,
+    var(--motion-move) ease-in-out both motion-slide;
+}
+
+::view-transition-old(.nav-forward) {
+  --slide-x: calc(var(--motion-slide-x) * -1);
+}
+::view-transition-new(.nav-forward) {
+  --slide-x: var(--motion-slide-x);
+}
+::view-transition-old(.nav-back) {
+  --slide-x: var(--motion-slide-x);
+}
+::view-transition-new(.nav-back) {
+  --slide-x: calc(var(--motion-slide-x) * -1);
+}
+
+/* 작성 화면 열기: 뒤 화면은 제자리에서 흐려지고, 작성 화면이 아래에서 올라온다 */
+::view-transition-old(.nav-up) {
+  --slide-y: 0px;
+}
+::view-transition-new(.nav-up) {
+  --slide-y: var(--motion-slide-y);
+  animation:
+    var(--motion-enter) ease-out both motion-fade,
+    var(--motion-move) cubic-bezier(0.2, 0.8, 0.2, 1) both motion-slide;
+}
+
+/* 작성 화면 닫기: 작성 화면이 아래로 내려가고, 뒤 화면이 제자리에서 나타난다 */
+::view-transition-old(.nav-down) {
+  --slide-y: var(--motion-slide-y);
+  animation:
+    var(--motion-exit) ease-in both motion-fade reverse,
+    var(--motion-move) ease-in both motion-slide reverse;
+}
+::view-transition-new(.nav-down) {
+  --slide-y: 0px;
+}
+
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+    filter: blur(var(--motion-blur));
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes motion-slide {
+  from {
+    translate: var(--slide-x, 0px) var(--slide-y, 0px);
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+/* 움직임 줄이기를 켠 사용자에게는 위치 이동 없이 바로 바꾼다 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--color-surface-page);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    /* 한글을 단어 중간에서 줄바꿈하지 않는다 */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+}

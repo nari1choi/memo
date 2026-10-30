@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumo — 생각보다 빠른 AI 메모 앱</title>
+  <style>
+    :root {
+      --red: #ff2a12;
+      --ink: #141414;
+      --paper: #ffffff;
+      --line: 1.5px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--red);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* Outlined, square-cornered button like the stat chips in the reference */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 28px;
+      border: var(--line) solid currentColor;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-decoration: none;
+      transition: background .15s ease, color .15s ease;
+    }
+    .btn::after { content: "→"; font-size: 18px; }
+    .btn:hover { background: var(--ink); color: var(--red); border-color: var(--ink); }
+    .btn:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; }
+
+    /* Hero */
+    .hero { padding: 48px 0 120px; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 3vw;
+      font-size: clamp(88px, 17vw, 220px);
+      font-weight: 200;
+      line-height: .9;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      margin-bottom: 72px;
+    }
+    .brand .rule {
+      flex: 1;
+      height: max(3px, .5vw);
+      background: var(--ink);
+    }
+    .hero-body {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 48px;
+      align-items: end;
+    }
+    .hero h1 {
+      font-size: 56px;
+      line-height: 1.15;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--paper);
+    }
+    .hero p {
+      font-size: 18px;
+      max-width: 400px;
+      margin-bottom: 32px;
+    }
+
+    /* Features: black rounded panel, as in the reference */
+    .features {
+      margin: 0 16px;
+      padding: 112px 0;
+      border-radius: 20px;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .section-label {
+      display: inline-block;
+      padding: 6px 12px;
+      border: var(--line) solid var(--red);
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-size: 44px;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 72px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: var(--line) solid var(--paper);
+    }
+    .card {
+      padding: 40px 32px 8px 0;
+    }
+    .card + .card {
+      padding-left: 32px;
+      border-left: var(--line) solid rgba(255, 255, 255, .35);
+    }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: var(--line) solid var(--paper);
+      background: var(--red);
+      font-size: 28px;
+      margin-bottom: 32px;
+    }
+    .card h3 {
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .card p { color: rgba(255, 255, 255, .7); font-size: 16px; }
+
+    /* Bottom CTA */
+    .cta {
+      padding: 140px 40px 120px;
+      text-align: center;
+    }
+    .cta h2 {
+      font-size: 64px;
+      font-weight: 200;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .cta p {
+      font-size: 18px;
+      margin-bottom: 44px;
+    }
+
+    footer .container {
+      padding-top: 24px;
+      padding-bottom: 32px;
+      border-top: var(--line) solid var(--ink);
+      font-size: 13px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
+      .hero { padding: 32px 0 80px; }
+      .brand { margin-bottom: 48px; }
+      .hero-body { grid-template-columns: 1fr; gap: 28px; }
+      .hero h1 { font-size: 38px; }
+      .hero p { font-size: 16px; }
+      .features { margin: 0 8px; padding: 72px 0; border-radius: 16px; }
+      .section-title { font-size: 30px; margin-bottom: 40px; }
+      .grid { grid-template-columns: 1fr; }
+      .card, .card + .card {
+        padding: 32px 0;
+        border-left: 0;
+      }
+      .card + .card { border-top: var(--line) solid rgba(255, 255, 255, .35); }
+      .cta { padding: 96px 20px 80px; }
+      .cta h2 { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="container">
+      <span class="brand" aria-label="Lumo"><span aria-hidden="true">Lu</span><span class="rule" aria-hidden="true"></span><span aria-hidden="true">mo</span></span>
+      <div class="hero-body">
+        <h1>생각보다 빠른<br><em>AI 메모 앱</em></h1>
+        <div>
+          <p>떠오른 생각을 적기만 하세요. 정리, 요약, 검색은 Lumo가 알아서 해 드립니다.</p>
+          <a href="#" class="btn">무료로 시작하기</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="features">
+      <div class="container">
+        <p class="section-label">FEATURES</p>
+        <h2 class="section-title">메모가 가벼워지는 세 가지 방법</h2>
+        <div class="grid">
+          <article class="card">
+            <div class="icon" aria-hidden="true">⚡</div>
+            <h3>즉시 캡처</h3>
+            <p>열자마자 바로 입력 상태.<br>단축키 한 번이면 어디서든 시작.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">✨</div>
+            <h3>AI 자동 정리</h3>
+            <p>흩어진 메모를 주제별로 묶고 요약.<br>태그 고민은 이제 그만.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">🔍</div>
+            <h3>의미로 찾는 검색</h3>
+            <p>단어가 기억나지 않아도 괜찮아요.<br>뜻으로 물어보면 찾아 줍니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>오늘 떠오른 생각,<br>Lumo에 남겨 보세요</h2>
+      <p>가입은 30초, 카드 등록 없이 바로 사용할 수 있습니다.</p>
+      <a href="#" class="btn">무료로 시작하기</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© 2026 Lumo. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>
